@@ -1,10 +1,9 @@
-ARG BASE_IMAGE
+ARG BASE_IMAGE=ubuntu:latest
 FROM ${BASE_IMAGE} as install-nginx
 LABEL maintainer="NGINX Agent Maintainers <agent@nginx.com>"
 
 ARG DEBIAN_FRONTEND=noninteractive
-ARG ENTRY_POINT
-ARG PACKAGE_NAME
+ARG ENTRY_POINT=./scripts/docker/nginx-oss/entrypoint.sh
 
 WORKDIR /agent
 COPY ./build /agent/build

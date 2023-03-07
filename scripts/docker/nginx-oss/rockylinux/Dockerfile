@@ -3,7 +3,7 @@ FROM ${BASE_IMAGE} as install-nginx
 LABEL maintainer="NGINX Agent Maintainers <agent@nginx.com>"
 
 ARG NGINX_CONF
-ARG ENTRY_POINT
+ARG ENTRY_POINT=./scripts/docker/nginx-oss/entrypoint.sh
 
 WORKDIR /agent
 COPY ./ /agent

@@ -252,6 +252,25 @@ image: ## Build agent container image for NGINX Plus, need nginx-repo.crt and ng
 		--build-arg OS_RELEASE=${OS_RELEASE} \
 		--build-arg OS_VERSION=${OS_VERSION}
 
+
+BUILD_PACKAGE=deb
+ifeq ($(OS_RELEASE),ubuntu)
+BUILD_PACKAGE = deb
+else ifeq ($(OS_RELEASE),rockylinux)
+BUILD_PACKAGE = rpm
+BASE_IMAGE    = "docker.io/${OS_RELEASE}:${OS_VERSION}"
+IMAGE_TAG     = "agent_${OS_RELEASE}_${OS_VERSION}"
+endif
+
+oss-image:
+	GOWORK=off CGO_ENABLED=0 GOARCH=${OSARCH} GOOS=linux go build -ldflags=${DEBUG_LDFLAGS} -o ./build/nginx-agent
+	ARCH=${OSARCH} VERSION=$(shell echo ${VERSION} | tr -d 'v') go run github.com/goreleaser/nfpm/v2/cmd/nfpm pkg --config ./scripts/.local-nfpm.yaml --packager $(BUILD_PACKAGE) --target ./build/${PACKAGE_PREFIX}-$(shell echo ${VERSION} | tr -d 'v')-SNAPSHOT-${COMMIT}.rpm;
+	@echo Building ${OS_RELEASE} open-source image with $(CONTAINER_CLITOOL); \
+	$(CONTAINER_BUILDENV) $(CONTAINER_CLITOOL) build -t ${IMAGE_TAG} . \
+	--no-cache -f ./scripts/docker/nginx-oss/${OS_RELEASE}/Dockerfile \
+		--build-arg BASE_IMAGE=${BASE_IMAGE} \
+		--build-arg PACKAGE_NAME=${PACKAGE_PREFIX}-$(shell echo ${VERSION} | tr -d 'v')-SNAPSHOT-${COMMIT}
+
 run-container: ## Run container from specified IMAGE_TAG
 	@echo Running ${IMAGE_TAG} with $(CONTAINER_CLITOOL); \
 		$(CONTAINER_CLITOOL) run ${IMAGE_TAG}
