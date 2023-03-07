@@ -25,7 +25,6 @@ import (
 )
 
 const (
-	// aihsdljdsaldasl;
 	advancedMetricsPluginVersion     = "v0.8.0"
 	advancedMetricsPluginName        = "Advanced Metrics Plugin"
 	aggregationDurationDimension     = "aggregation_duration"
