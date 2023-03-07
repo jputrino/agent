@@ -8,4 +8,4 @@ pre-push:
     2_format:
       run: make format
     3_dependencies:
-      run: make deps
+      run: make deps && make clean-work-tree

@@ -102,7 +102,14 @@ deps: ## Update dependencies in vendor folders
 	done
 	go mod download
 	go work sync
-	git diff --quiet || { echo "Depenency changes detected. Please commit these before pushing." >&2; exit 1; }
+
+clean-work-tree:
+	# test if working tree is dirty
+	git rev-parse --verify HEAD > /dev/null && \
+	git update-index --ignore-submodules --refresh && \
+	git diff-files --quiet --ignore-submodules && \
+	git diff-index --cached --quiet HEAD --ignore-submodules -- || \
+	echo "Depenency changes detected. Please commit these before pushing." >&2; exit 1;
 
 lint: ## Run linter
 	GOWORK=off go vet ./...
